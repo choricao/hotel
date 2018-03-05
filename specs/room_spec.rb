@@ -11,16 +11,26 @@ describe "Room" do
       @room.must_be_instance_of Hotel::Room
     end
 
-    it "accesses the room number" do
+    it "reads the room number" do
       @room.must_respond_to :number
       @room.number.must_be_kind_of Integer
       @room.number.must_equal 1
     end
 
-    it "accesses the rate of the room" do
+    it "reads the rate of the room" do
       @room.must_respond_to :rate
       @room.rate.must_be_instance_of Integer
       @room.rate.must_equal 200
+    end
+
+    it "reads and writes the status of the room" do
+      @room.must_respond_to :status
+      @room.status.must_be_kind_of Symbol
+      @room.status.must_equal :AVAILABLE
+
+      @room.status = :UNAVAILABLE
+
+      @room.status.must_equal :UNAVAILABLE
     end
 
     it "raises an ArgumentError if the room number is invalid" do

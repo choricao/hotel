@@ -2,6 +2,7 @@ module Hotel
   class Room
 
     attr_reader :number, :rate
+    attr_accessor :status
 
     def initialize(number, rate)
       if !(1..20).include?(number)
@@ -9,6 +10,7 @@ module Hotel
       end
       @number = number
       @rate = rate
+      @status = :AVAILABLE
     end
 
   end
