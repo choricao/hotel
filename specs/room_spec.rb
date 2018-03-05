@@ -1,6 +1,6 @@
 require_relative 'spec_helper'
 
-describe "Room" do
+xdescribe "Room" do
 
   describe "initialize" do
     before do
@@ -24,7 +24,7 @@ describe "Room" do
     end
 
     it "raises an ArgumentError if the room number is invalid" do
-      proc { room = Hotel::Room.new(21, 200) }.must_raise ArgumentError
+      proc { Hotel::Room.new(21, 200) }.must_raise ArgumentError
     end
 
   end
