@@ -5,7 +5,7 @@ describe "FrontDesk" do
     @front_desk = Hotel::FrontDesk.new
   end
 
-  describe "initialize" do
+  xdescribe "initialize" do
 
     it "creates an instance of FrontDesk" do
       @front_desk.must_be_instance_of Hotel::FrontDesk
@@ -27,7 +27,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "add_reservation" do
+  xdescribe "add_reservation" do
     before do
       @check_in_date = Date.new(2018, 3, 5)
       @check_out_date = Date.new(2018, 3, 7)
@@ -69,7 +69,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "list_reservations" do
+  xdescribe "list_reservations" do
     before do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
       @front_desk.add_reservation(Date.new(2018, 3, 6), Date.new(2018, 3, 8))
@@ -93,5 +93,24 @@ describe "FrontDesk" do
     end
 
   end
+
+  describe "list_empty_rooms" do
+    before do
+      @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+    end
+
+    it "returns a list of empty rooms on a specific date" do
+      @front_desk.list_empty_rooms(Date.new(2018, 3, 4)).length.must_equal 20
+      @front_desk.list_empty_rooms(Date.new(2018, 3, 5)).length.must_equal 19
+      @front_desk.list_empty_rooms(Date.new(2018, 3, 7)).length.must_equal 20
+    end
+
+    it "returns an empty array if no empty room exists on that date" do
+
+    end
+
+  end
+
+
 
 end

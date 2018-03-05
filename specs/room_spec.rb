@@ -1,6 +1,6 @@
 require_relative 'spec_helper'
 
-describe "Room" do
+xdescribe "Room" do
 
   describe "initialize" do
     before do
