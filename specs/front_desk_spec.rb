@@ -132,7 +132,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "create_room_block" do
+  xdescribe "create_room_block" do
 
     it "returns a room block hash" do
       room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
@@ -165,6 +165,47 @@ describe "FrontDesk" do
 
   end
 
+  describe "reserve_from_block" do
+    before do
+      @room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
+    end
+
+    it "creates a new instance of Reservation" do
+      reservation = @front_desk.reserve_from_block("0")
+
+      reservation.must_be_instance_of Hotel::Reservation
+    end
+
+    it "assigns a room from the room block and remove it from list" do
+      reservation = @front_desk.reserve_from_block("0")
+
+      @room_block[:rooms].include?(reservation.room).must_equal false
+      @room_block[:rooms].length.must_equal 4
+    end
+
+    it "returns reservation with correct date range" do
+      reservation = @front_desk.reserve_from_block("0")
+
+      reservation.check_in_date.must_equal Date.new(2018, 3, 5)
+      reservation.check_out_date.must_equal Date.new(2018, 3, 7)
+    end
+
+    it "adds the new reservation to the reservation list" do
+      orig_number = @front_desk.reservations.length
+
+      reservation = @front_desk.reserve_from_block("0")
+
+      @front_desk.reservations.length.must_equal orig_number + 1
+      @front_desk.reservations.include?(reservation).must_equal true
+    end
+
+
+    it "raises an Exception if there is no room available from that room block" do
+      proc { 6.times {@front_desk.reserve_from_block("0")} }.must_raise Exception
+    end
+
+  end
+
   xdescribe "check_block_availability" do
 
     it "returns a list of rooms available in that block" do
@@ -177,28 +218,6 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "reserve_from_block" do
 
-    it "creates a new instance of Reservation" do
-
-    end
-
-    it "assigns a room from the room block" do
-
-    end
-
-    it "adds the new reservation to the reservation list" do
-
-    end
-
-    it "returns the newly created reservation" do
-
-    end
-
-    it "raises an Exception if there is no room available from that room block" do
-
-    end
-
-  end
 
 end
