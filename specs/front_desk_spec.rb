@@ -5,7 +5,7 @@ describe "FrontDesk" do
     @front_desk = Hotel::FrontDesk.new
   end
 
-  xdescribe "initialize" do
+  describe "initialize" do
 
     it "creates an instance of FrontDesk" do
       @front_desk.must_be_instance_of Hotel::FrontDesk
@@ -27,7 +27,7 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "add_reservation" do
+  describe "add_reservation" do
     before do
       @check_in_date = Date.new(2018, 3, 5)
       @check_out_date = Date.new(2018, 3, 7)
@@ -79,7 +79,7 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "list_reservations" do
+  describe "list_reservations" do
     before do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
       @front_desk.add_reservation(Date.new(2018, 3, 6), Date.new(2018, 3, 8))
@@ -104,7 +104,7 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "list_empty_rooms" do
+  describe "list_empty_rooms" do
 
     it "returns a list of empty rooms on a specific date" do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
@@ -132,7 +132,7 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "create_room_block" do
+  describe "create_room_block" do
 
     it "returns a room block hash" do
       room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
@@ -163,9 +163,13 @@ describe "FrontDesk" do
       proc { @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9) }.must_raise Exception
     end
 
+    it "raises an Exception if room count is invalid" do
+      proc { room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 0, 0.9) }.must_raise Exception
+    end
+
   end
 
-  xdescribe "reserve_from_block" do
+  describe "reserve_from_block" do
     before do
       @room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
     end
