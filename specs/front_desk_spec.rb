@@ -165,7 +165,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "reserve_from_block" do
+  xdescribe "reserve_from_block" do
     before do
       @room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
     end
@@ -206,18 +206,28 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "check_block_availability" do
+  describe "check_block_availability" do
+    before do
+      @room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
+    end
 
     it "returns a list of rooms available in that block" do
+      rooms = @front_desk.check_block_availability("0")
 
+      rooms.length.must_equal 5
+      rooms.each do |room|
+        room.must_be_instance_of Hotel::Room
+      end
     end
 
     it "raises an Exception if no room available in that block" do
+      5.times do
+        @front_desk.reserve_from_block("0")
+      end
 
+      proc { @front_desk.check_block_availability("0") }.must_raise Exception
     end
 
   end
-
-
 
 end

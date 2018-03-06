@@ -72,24 +72,27 @@ module Hotel
       end
     end
 
-
     def reserve_from_block(block_id)
+      rooms = check_block_availability(block_id)
       block_value = @room_blocks[block_id]
 
+      check_in_date = block_value[:check_in_date]
+      check_out_date = block_value[:check_out_date]
+      reservation = Hotel::Reservation.new(check_in_date, check_out_date, rooms.pop)
+
+      @reservations << reservation
+
+      return reservation
+    end
+
+    def check_block_availability(block_id)
+      block_value = @room_blocks[block_id]
       rooms = block_value[:rooms]
       if rooms.empty?
         raise Exception.new("No room available from this room block")
       else
-        check_in_date = block_value[:check_in_date]
-        check_out_date = block_value[:check_out_date]
-        reservation = Hotel::Reservation.new(check_in_date, check_out_date, rooms.pop)
-        @reservations << reservation
-        return reservation
+        return rooms
       end
-    end
-
-    def check_block_availability(block_id)
-
     end
 
     private
