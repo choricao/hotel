@@ -5,7 +5,7 @@ describe "FrontDesk" do
     @front_desk = Hotel::FrontDesk.new
   end
 
-  xdescribe "initialize" do
+  describe "initialize" do
 
     it "creates an instance of FrontDesk" do
       @front_desk.must_be_instance_of Hotel::FrontDesk
@@ -27,7 +27,7 @@ describe "FrontDesk" do
 
   end
 
-  xdescribe "add_reservation" do
+  describe "add_reservation" do
     before do
       @check_in_date = Date.new(2018, 3, 5)
       @check_out_date = Date.new(2018, 3, 7)
@@ -39,11 +39,13 @@ describe "FrontDesk" do
       reservation.must_be_instance_of Hotel::Reservation
     end
 
-    it "assigns a room from the room list" do
+    it "assigns a room from the empty room list" do
       reservation = @front_desk.add_reservation(@check_in_date, @check_out_date)
 
       reservation.room.must_be_instance_of Hotel::Room
-      @front_desk.rooms.include?(reservation.room).must_equal true
+      @front_desk.list_empty_rooms(@check_in_date).include?(reservation.room).must_equal false
+      @front_desk.list_empty_rooms(@check_out_date - 1).include?(reservation.room).must_equal false
+      @front_desk.list_empty_rooms(@check_out_date).include?(reservation.room).must_equal true
     end
 
     it "adds the new reservation to the reservation list" do
@@ -67,9 +69,17 @@ describe "FrontDesk" do
       proc { @front_desk.add_reservation(@check_out_date, @check_in_date) }.must_raise ArgumentError
     end
 
+    it "raises an Exception if there is no room available" do
+      20.times do
+        @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+      end
+
+      proc { @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7)) }.must_raise Exception
+    end
+
   end
 
-  xdescribe "list_reservations" do
+  describe "list_reservations" do
     before do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
       @front_desk.add_reservation(Date.new(2018, 3, 6), Date.new(2018, 3, 8))

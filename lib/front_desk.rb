@@ -9,8 +9,11 @@ module Hotel
     end
 
     def add_reservation(check_in_date, check_out_date)
-      # A reservation is allowed start on the same day that another reservation for the same room ends
       # Your code should raise an exception when asked to reserve a room that is not available
+      if check_in_date >= check_out_date
+        raise ArgumentError.new("Invalid check out date")
+      end
+      
       avail_rooms_array = []
       (check_in_date...check_out_date).to_a.each do |date|
         avail_rooms_array << list_empty_rooms(date)
@@ -21,10 +24,13 @@ module Hotel
         avail_rooms = avail_rooms & avail_rooms_array[i + 1]
       end
 
-      reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
-      @reservations << reservation
-
-      return reservation
+      if avail_rooms.empty?
+        raise Exception.new("No room is available for this date range")
+      else
+        reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
+        @reservations << reservation
+        return reservation
+      end
     end
 
     def list_reservations(date)
