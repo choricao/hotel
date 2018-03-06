@@ -95,22 +95,31 @@ describe "FrontDesk" do
   end
 
   describe "list_empty_rooms" do
-    before do
-      @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
-    end
 
     it "returns a list of empty rooms on a specific date" do
+      @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+
       @front_desk.list_empty_rooms(Date.new(2018, 3, 4)).length.must_equal 20
       @front_desk.list_empty_rooms(Date.new(2018, 3, 5)).length.must_equal 19
+      @front_desk.list_empty_rooms(Date.new(2018, 3, 6)).length.must_equal 19
       @front_desk.list_empty_rooms(Date.new(2018, 3, 7)).length.must_equal 20
     end
 
     it "returns an empty array if no empty room exists on that date" do
+        20.times do
+          @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+        end
 
+        @front_desk.list_empty_rooms(Date.new(2018, 3, 4)).length.must_equal 20
+        @front_desk.list_empty_rooms(Date.new(2018, 3, 5)).length.must_equal 0
+        @front_desk.list_empty_rooms(Date.new(2018, 3, 6)).length.must_equal 0
+        @front_desk.list_empty_rooms(Date.new(2018, 3, 7)).length.must_equal 20
+    end
+
+    it "raises an ArgumentError if the date is invalid" do
+      proc { reservations = @front_desk.list_empty_rooms(1) }.must_raise ArgumentError
     end
 
   end
-
-
 
 end
