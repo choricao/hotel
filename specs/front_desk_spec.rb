@@ -5,7 +5,7 @@ describe "FrontDesk" do
     @front_desk = Hotel::FrontDesk.new
   end
 
-  describe "initialize" do
+  xdescribe "initialize" do
 
     it "creates an instance of FrontDesk" do
       @front_desk.must_be_instance_of Hotel::FrontDesk
@@ -27,7 +27,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "add_reservation" do
+  xdescribe "add_reservation" do
     before do
       @check_in_date = Date.new(2018, 3, 5)
       @check_out_date = Date.new(2018, 3, 7)
@@ -79,7 +79,7 @@ describe "FrontDesk" do
 
   end
 
-  describe "list_reservations" do
+  xdescribe "list_reservations" do
     before do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
       @front_desk.add_reservation(Date.new(2018, 3, 6), Date.new(2018, 3, 8))
@@ -99,12 +99,12 @@ describe "FrontDesk" do
     end
 
     it "raises an ArgumentError if the date is invalid" do
-      proc { reservations = @front_desk.list_reservations(1) }.must_raise ArgumentError
+      proc { @front_desk.list_reservations(1) }.must_raise ArgumentError
     end
 
   end
 
-  describe "list_empty_rooms" do
+  xdescribe "list_empty_rooms" do
 
     it "returns a list of empty rooms on a specific date" do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
@@ -127,7 +127,76 @@ describe "FrontDesk" do
     end
 
     it "raises an ArgumentError if the date is invalid" do
-      proc { reservations = @front_desk.list_empty_rooms(1) }.must_raise ArgumentError
+      proc { @front_desk.list_empty_rooms(1) }.must_raise ArgumentError
+    end
+
+  end
+
+  describe "create_room_block" do
+
+    it "returns a room block hash" do
+      room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
+
+      room_block[:rooms].length.must_equal 5
+      room_block[:rooms].each do |room|
+        room.must_be_instance_of Hotel::Room
+      end
+      room_block[:check_in_date].must_equal Date.new(2018, 3, 5)
+      room_block[:check_out_date].must_equal Date.new(2018, 3, 7)
+      room_block[:discount].must_equal 0.9
+    end
+
+    it "updates the room block list" do
+      orig_number = @front_desk.room_blocks.length
+
+      room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
+
+      @front_desk.room_blocks.length.must_equal orig_number + 1
+      @front_desk.room_blocks.values.include?(room_block).must_equal true
+    end
+
+    it "raises an Exception if there is not enough rooms available for creating the block" do
+      16.times do
+        @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+      end
+
+      proc { @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9) }.must_raise Exception
+    end
+
+  end
+
+  xdescribe "check_block_availability" do
+
+    it "returns a list of rooms available in that block" do
+
+    end
+
+    it "raises an Exception if no room available in that block" do
+
+    end
+
+  end
+
+  xdescribe "reserve_from_block" do
+
+    it "creates a new instance of Reservation" do
+
+    end
+
+    it "assigns a room from the room block" do
+
+    end
+
+    it "adds the new reservation to the reservation list" do
+
+    end
+
+    it "returns the newly created reservation" do
+
+    end
+
+    it "raises an Exception if there is no room available from that room block" do
+
     end
 
   end

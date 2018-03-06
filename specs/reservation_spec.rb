@@ -1,6 +1,6 @@
 require_relative 'spec_helper'
 
-describe "Reservation" do
+xdescribe "Reservation" do
 
   describe "initialize" do
     before do
