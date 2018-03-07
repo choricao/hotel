@@ -134,7 +134,7 @@ def make_reservation(front_desk)
   puts "Please enter check out date (yyyy-mm-dd):"
   check_out_date = Date.parse(validate_date)
   reservation = front_desk.add_reservation(check_in_date, check_out_date)
-  puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}."
+  puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}. The total cost for this reservation is $#{reservation.cost}"
 end
 
 def operate_reservations(choice, reservation_operations, front_desk)
@@ -179,19 +179,19 @@ def add_block(front_desk)
   check_out_date = Date.parse(validate_date)
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
   room_count = validate_room_count
-  puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? "
+  puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? ( 0.0 <= rate <= 1.0 )"
   discount = validate_discount
   block_value = front_desk.create_room_block(check_in_date, check_out_date, room_count, discount)
   puts "A block with #{room_count} rooms between #{check_in_date} and #{check_out_date} has been added. The discount rate is #{discount}."
 end
 
-# TODO update cost calculation
 def reserve_from_block(front_desk)
   if list_all_blocks(front_desk)
     puts "Please choose the block you want to reserve from:"
     block_id = (gets.chomp.to_i - 1).to_s
     reservation = front_desk.reserve_from_block(block_id)
-    puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block."
+    reservation.cost *= front_desk.room_blocks[block_id][:discount]
+    puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block. The total cost for this reservation is $#{reservation.cost}"
   end
 end
 

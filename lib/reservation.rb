@@ -3,7 +3,8 @@ require_relative 'room'
 module Hotel
   class Reservation
 
-    attr_reader :check_in_date, :check_out_date, :room, :cost
+    attr_reader :check_in_date, :check_out_date, :room
+    attr_accessor :cost
 
     def initialize(check_in_date, check_out_date, room)
       if check_in_date >= check_out_date
