@@ -5,8 +5,6 @@ require_relative './lib/room.rb'
 require 'pry'
 require 'date'
 
-
-
 def validate_choice(choices)
   user_choice = gets.chomp.to_i
   until choices.include?(user_choice)
@@ -16,15 +14,26 @@ def validate_choice(choices)
   return user_choice
 end
 
-# TODO also validate date information
 def validate_date
   date = gets.chomp
   pattern = /^\d{4}-\d{1,2}-\d{1,2}$/
-  until pattern.match(date)
-    puts "Please enter a valid date following the provided format:"
-    date = gets.chomp
+
+  while true
+    until pattern.match(date)
+      puts "Please enter a valid date following the provided format:"
+      date = gets.chomp
+    end
+
+    date_strings = date.split("-")
+    date_array = date_strings.map(&:to_i)
+
+    if Date.valid_date?(date_array[0], date_array[1], date_array[2])
+      return Date.parse(date)
+    else
+      puts "Please enter a valid date following the provided format:"
+      date = gets.chomp
+    end
   end
-  return date
 end
 
 def validate_room_count
@@ -68,9 +77,9 @@ end
 
 def list_avail_rooms(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = Date.parse(validate_date)
+  check_in_date = validate_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = Date.parse(validate_date)
+  check_out_date = validate_date
   avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
   if avail_rooms.length == 0
     puts "There is no available room between #{check_in_date} and #{check_out_date}."
@@ -116,7 +125,7 @@ end
 
 def list_reservations_for_a_date(front_desk)
   puts "Please enter the date (yyyy-mm-dd) you want to see:"
-  date = Date.parse(validate_date)
+  date = validate_date
   reservations = front_desk.list_reservations(date)
   if reservations.length == 0
     puts "There is no existing reservation on #{date}."
@@ -130,9 +139,9 @@ end
 
 def make_reservation(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = Date.parse(validate_date)
+  check_in_date = validate_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = Date.parse(validate_date)
+  check_out_date = validate_date
   reservation = front_desk.add_reservation(check_in_date, check_out_date)
   puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}. The total cost for this reservation is $#{reservation.cost}"
 end
@@ -174,9 +183,9 @@ end
 
 def add_block(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = Date.parse(validate_date)
+  check_in_date = validate_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = Date.parse(validate_date)
+  check_out_date = validate_date
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
   room_count = validate_room_count
   puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? ( 0.0 <= rate <= 1.0 )"
