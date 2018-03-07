@@ -76,8 +76,49 @@ def operate_rooms(choice, room_operations, front_desk)
 end
 
 # RESERVATION
+def print_reservations(reservations)
+  reservations.length.times do |i|
+    curr_res = reservations[i]
+    puts "#{i + 1}. Check in: #{curr_res.check_in_date}, Check out: #{curr_res.check_out_date}, Room: #{curr_res.room.number}, Cost: $#{curr_res.cost}"
+  end
+end
 
-def operate_reservations(choice)
+def list_all_reservations(front_desk)
+  all_reservations = front_desk.reservations
+  puts "Here is a list of all reservations in this hotel:"
+  print_reservations(all_reservations)
+end
+
+def list_reservations_for_a_date(front_desk)
+  puts "Please enter the date (yyyy-mm-dd) you want to see:"
+  date = Date.parse(validate_date)
+  reservations = front_desk.list_reservations(date)
+  puts "Here is a list of reservations on #{date}:"
+  print_reservations(reservations)
+end
+
+def make_reservation(front_desk)
+  puts "Please enter check in date (yyyy-mm-dd):"
+  check_in_date = Date.parse(validate_date)
+  puts "Please enter check out date (yyyy-mm-dd):"
+  check_out_date = Date.parse(validate_date)
+  reservation = front_desk.add_reservation(check_in_date, check_out_date)
+  puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}."
+end
+
+def operate_reservations(choice, reservation_operations, front_desk)
+  until choice == reservation_operations.length + 1
+    case choice
+      when 1
+        list_all_reservations(front_desk)
+      when 2
+        list_reservations_for_a_date(front_desk)
+      when 3
+        make_reservation(front_desk)
+    end
+    print_list(reservation_operations)
+    choice = validate_choice((1..(reservation_operations.length + 1)))
+  end
 end
 
 # BLOCK
@@ -97,12 +138,12 @@ until operation == operations.length + 1
       operate_rooms(room_choice, room_operations, front_desk)
     when 2
       print_list(reservation_operations)
-      reservation_operation = validate_choice((1..(reservation_operations.length + 1)))
-      operate_reservations(reservation_operation)
+      reservation_choice = validate_choice((1..(reservation_operations.length + 1)))
+      operate_reservations(reservation_choice, reservation_operations, front_desk)
     when 3
       print_list(block_operations)
-      block_operation = validate_choice((1..(block_operations.length + 1)))
-      operate_blocks(block_operation)
+      block_choice = validate_choice((1..(block_operations.length + 1)))
+      operate_blocks(block_choice)
   end
   print_list(operations)
   operation = validate_choice((1..(operations.length + 1)))
