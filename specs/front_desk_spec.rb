@@ -39,13 +39,11 @@ describe "FrontDesk" do
       reservation.must_be_instance_of Hotel::Reservation
     end
 
-    it "assigns a room from the empty room list" do
+    it "assigns a room from the available room list" do
       reservation = @front_desk.add_reservation(@check_in_date, @check_out_date)
 
       reservation.room.must_be_instance_of Hotel::Room
-      @front_desk.list_empty_rooms(@check_in_date).include?(reservation.room).must_equal false
-      @front_desk.list_empty_rooms(@check_out_date - 1).include?(reservation.room).must_equal false
-      @front_desk.list_empty_rooms(@check_out_date).include?(reservation.room).must_equal true
+      @front_desk.get_avail_rooms(@check_in_date, @check_out_date).include?(reservation.room).must_equal false
     end
 
     it "adds the new reservation to the reservation list" do
@@ -104,30 +102,31 @@ describe "FrontDesk" do
 
   end
 
-  describe "list_empty_rooms" do
+  describe "get_avail_rooms" do
 
-    it "returns a list of empty rooms on a specific date" do
+    it "returns a list of empty rooms for a given date range" do
       @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+      @front_desk.add_reservation(Date.new(2018, 3, 6), Date.new(2018, 3, 8))
+      @front_desk.add_reservation(Date.new(2018, 3, 7), Date.new(2018, 3, 9))
 
-      @front_desk.list_empty_rooms(Date.new(2018, 3, 4)).length.must_equal 20
-      @front_desk.list_empty_rooms(Date.new(2018, 3, 5)).length.must_equal 19
-      @front_desk.list_empty_rooms(Date.new(2018, 3, 6)).length.must_equal 19
-      @front_desk.list_empty_rooms(Date.new(2018, 3, 7)).length.must_equal 20
+      @front_desk.get_avail_rooms(Date.new(2018, 3, 5), Date.new(2018, 3, 6)).length.must_equal 19
+      @front_desk.get_avail_rooms(Date.new(2018, 3, 5), Date.new(2018, 3, 7)).length.must_equal 18
+      @front_desk.get_avail_rooms(Date.new(2018, 3, 5), Date.new(2018, 3, 8)).length.must_equal 17
     end
 
-    it "returns an empty array if no empty room exists on that date" do
+    it "returns an empty array if no empty room exists for a given date range" do
         20.times do
           @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
         end
 
-        @front_desk.list_empty_rooms(Date.new(2018, 3, 4)).length.must_equal 20
-        @front_desk.list_empty_rooms(Date.new(2018, 3, 5)).length.must_equal 0
-        @front_desk.list_empty_rooms(Date.new(2018, 3, 6)).length.must_equal 0
-        @front_desk.list_empty_rooms(Date.new(2018, 3, 7)).length.must_equal 20
+        @front_desk.get_avail_rooms(Date.new(2018, 3, 4), Date.new(2018, 3, 5)).length.must_equal 20
+        @front_desk.get_avail_rooms(Date.new(2018, 3, 5), Date.new(2018, 3, 6)).length.must_equal 0
+        @front_desk.get_avail_rooms(Date.new(2018, 3, 6), Date.new(2018, 3, 7)).length.must_equal 0
+        @front_desk.get_avail_rooms(Date.new(2018, 3, 7), Date.new(2018, 3, 8)).length.must_equal 20
     end
 
-    it "raises an ArgumentError if the date is invalid" do
-      proc { @front_desk.list_empty_rooms(1) }.must_raise ArgumentError
+    it "raises an ArgumentError if the date range is invalid" do
+      proc { @front_desk.get_avail_rooms(1, 2) }.must_raise ArgumentError
     end
 
   end

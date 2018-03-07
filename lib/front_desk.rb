@@ -37,24 +37,27 @@ module Hotel
       return list
     end
 
-    def list_empty_rooms(date)
-      check_date(date)
-
-      reservation_list = list_reservations(date)
-      reserved_rooms = []
-
-      reservation_list.each do |reservation|
-        reserved_rooms << reservation.room
+    def get_avail_rooms(check_in_date, check_out_date)
+      avail_rooms_array = []
+      (check_in_date...check_out_date).to_a.each do |date|
+        avail_rooms_array << list_empty_rooms(date)
       end
 
-      return @rooms - reserved_rooms
+      avail_rooms = avail_rooms_array[0]
+      (avail_rooms_array.length - 1).times do |i|
+        avail_rooms = avail_rooms & avail_rooms_array[i + 1]
+      end
+
+      return avail_rooms
     end
 
+    # TODO: If a room is set aside in a block, it is not available for reservation by the general public, nor can it be included in another block
     def create_room_block(check_in_date, check_out_date, room_count, discount)
       check_date(check_in_date)
       check_date(check_out_date)
       check_date_range(check_in_date, check_out_date)
       check_room_count(room_count)
+
       avail_rooms = get_avail_rooms(check_in_date, check_out_date)
 
       if avail_rooms.length < room_count
@@ -123,18 +126,17 @@ module Hotel
       end
     end
 
-    def get_avail_rooms(check_in_date, check_out_date)
-      avail_rooms_array = []
-      (check_in_date...check_out_date).to_a.each do |date|
-        avail_rooms_array << list_empty_rooms(date)
+    def list_empty_rooms(date)
+      check_date(date)
+
+      reservation_list = list_reservations(date)
+      reserved_rooms = []
+
+      reservation_list.each do |reservation|
+        reserved_rooms << reservation.room
       end
 
-      avail_rooms = avail_rooms_array[0]
-      (avail_rooms_array.length - 1).times do |i|
-        avail_rooms = avail_rooms & avail_rooms_array[i + 1]
-      end
-
-      return avail_rooms
+      return @rooms - reserved_rooms
     end
 
   end
