@@ -129,6 +129,16 @@ describe "FrontDesk" do
       proc { @front_desk.get_avail_rooms(1, 2) }.must_raise ArgumentError
     end
 
+    it "does not return a room from any room block" do
+      @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+      room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
+
+      avail_rooms = @front_desk.get_avail_rooms(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+
+      avail_rooms.length.must_equal 14
+      (room_block[:rooms] & avail_rooms).must_equal []
+    end
+
   end
 
   describe "create_room_block" do
@@ -209,13 +219,13 @@ describe "FrontDesk" do
 
   end
 
-  describe "check_block_availability" do
+  describe "get_avail_rooms_from_block" do
     before do
       @room_block = @front_desk.create_room_block(Date.new(2018, 3, 5), Date.new(2018, 3, 7), 5, 0.9)
     end
 
     it "returns a list of rooms available in that block" do
-      rooms = @front_desk.check_block_availability("0")
+      rooms = @front_desk.get_avail_rooms_from_block("0")
 
       rooms.length.must_equal 5
       rooms.each do |room|
@@ -228,7 +238,7 @@ describe "FrontDesk" do
         @front_desk.reserve_from_block("0")
       end
 
-      proc { @front_desk.check_block_availability("0") }.must_raise Exception
+      proc { @front_desk.get_avail_rooms_from_block("0") }.must_raise Exception
     end
 
   end
