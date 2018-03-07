@@ -5,11 +5,7 @@ require_relative './lib/room.rb'
 require 'pry'
 require 'date'
 
-operations = ["Rooms", "Reservations", "Room Blocks"]
-room_operations = ["List all rooms", "List available rooms for a given date range"]
-reservation_operations = ["List all reservations", "List reservations for a specific date", "Make a reservation"]
-block_operations = ["List all room blocks", "Create a room block", "Reserve from a room block"]
-front_desk = Hotel::FrontDesk.new
+
 
 def validate_choice(choices)
   user_choice = gets.chomp.to_i
@@ -20,9 +16,8 @@ def validate_choice(choices)
   return user_choice
 end
 
-# TODO
+# TODO also validate date information
 def validate_date
-  # TODO: also validate date information
   date = gets.chomp
   pattern = /^\d{4}-\d{1,2}-\d{1,2}$/
   until pattern.match(date)
@@ -32,12 +27,22 @@ def validate_date
   return date
 end
 
-# TODO
 def validate_room_count
+  room_count = gets.chomp.to_i
+  until room_count > 0 && room_count <= 5
+    puts "Please enter a valid number:"
+    room_count = gets.chomp.to_i
+  end
+  return room_count
 end
 
-# TODO
 def validate_discount
+  discount = gets.chomp.to_f
+  until discount >= 0 && discount <= 1
+    puts "Please enter a valid number:"
+    discount = gets.chomp.to_f
+  end
+  return discount
 end
 
 def print_list(list)
@@ -67,8 +72,13 @@ def list_avail_rooms(front_desk)
   puts "Please enter check out date (yyyy-mm-dd):"
   check_out_date = Date.parse(validate_date)
   avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
-  puts "Here is a list of rooms available between #{check_in_date} and #{check_out_date}: "
-  print_rooms(avail_rooms)
+  if avail_rooms.length == 0
+    puts "There is no available room between #{check_in_date} and #{check_out_date}."
+    return false
+  else
+    puts "Here is a list of rooms available between #{check_in_date} and #{check_out_date}: "
+    print_rooms(avail_rooms)
+  end
 end
 
 def operate_rooms(choice, room_operations, front_desk)
@@ -94,16 +104,28 @@ end
 
 def list_all_reservations(front_desk)
   all_reservations = front_desk.reservations
-  puts "Here is a list of all reservations in this hotel:"
-  print_reservations(all_reservations)
+  if all_reservations.length == 0
+    puts "There is no existing reservation."
+    return false
+  else
+    puts "Here is a list of all reservations in this hotel:"
+    print_reservations(all_reservations)
+    return true
+  end
 end
 
 def list_reservations_for_a_date(front_desk)
   puts "Please enter the date (yyyy-mm-dd) you want to see:"
   date = Date.parse(validate_date)
   reservations = front_desk.list_reservations(date)
-  puts "Here is a list of reservations on #{date}:"
-  print_reservations(reservations)
+  if reservations.length == 0
+    puts "There is no existing reservation on #{date}."
+    return false
+  else
+    puts "Here is a list of reservations on #{date}:"
+    print_reservations(reservations)
+    return true
+  end
 end
 
 def make_reservation(front_desk)
@@ -156,18 +178,18 @@ def add_block(front_desk)
   puts "Please enter check out date (yyyy-mm-dd):"
   check_out_date = Date.parse(validate_date)
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
-  room_count = gets.chomp.to_i
+  room_count = validate_room_count
   puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? "
-  discount = gets.chomp.to_f
+  discount = validate_discount
   block_value = front_desk.create_room_block(check_in_date, check_out_date, room_count, discount)
   puts "A block with #{room_count} rooms between #{check_in_date} and #{check_out_date} has been added. The discount rate is #{discount}."
 end
 
+# TODO update cost calculation
 def reserve_from_block(front_desk)
   if list_all_blocks(front_desk)
     puts "Please choose the block you want to reserve from:"
     block_id = (gets.chomp.to_i - 1).to_s
-    binding.pry
     reservation = front_desk.reserve_from_block(block_id)
     puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block."
   end
@@ -189,6 +211,12 @@ def operate_blocks(choice, block_operations, front_desk)
 end
 
 # MAIN
+operations = ["Rooms", "Reservations", "Room Blocks"]
+room_operations = ["List all rooms", "List available rooms for a given date range"]
+reservation_operations = ["List all reservations", "List reservations for a specific date", "Make a reservation"]
+block_operations = ["List all room blocks", "Create a room block", "Reserve room from a block"]
+front_desk = Hotel::FrontDesk.new
+
 puts "Welcome to the Hotel Booking System!"
 print_list(operations)
 operation = validate_choice((1..(operations.length + 1)))
