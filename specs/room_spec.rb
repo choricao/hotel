@@ -23,6 +23,12 @@ describe "Room" do
       @room.rate.must_equal 200
     end
 
+    it "writes the rate of the room" do
+      @room.rate = 180
+
+      @room.rate.must_equal 180
+    end
+
     it "raises an ArgumentError if the room number is invalid" do
       proc { Hotel::Room.new(21, 200) }.must_raise ArgumentError
     end

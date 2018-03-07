@@ -1,7 +1,8 @@
 module Hotel
   class Room
 
-    attr_reader :number, :rate
+    attr_reader :number
+    attr_accessor :rate
 
     def initialize(number, rate)
       if !(1..20).include?(number)
