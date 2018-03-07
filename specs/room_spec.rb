@@ -23,16 +23,6 @@ describe "Room" do
       @room.rate.must_equal 200
     end
 
-    it "reads and writes the status of the room" do
-      @room.must_respond_to :status
-      @room.status.must_be_kind_of Symbol
-      @room.status.must_equal :AVAILABLE
-
-      @room.status = :UNAVAILABLE
-
-      @room.status.must_equal :UNAVAILABLE
-    end
-
     it "raises an ArgumentError if the room number is invalid" do
       proc { Hotel::Room.new(21, 200) }.must_raise ArgumentError
     end
