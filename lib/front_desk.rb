@@ -1,15 +1,39 @@
+require 'csv'
+
 module Hotel
   class FrontDesk
 
-    attr_reader :rooms, :reservations, :room_blocks
+    attr_reader :rooms, :room_blocks
 
     def initialize
       @rooms = generate_rooms
-      @reservations = []
+      @reservations = load_reservations
       @room_blocks = {}
     end
 
+    def load_reservations
+      my_file = CSV.read('support/reservations.csv', headers: true)
+      all_reservations = []
+
+      my_file.each do |line|
+        @rooms.each do |room|
+          if room.number.to_s == line["room_number"]
+            reservation = Hotel::Reservation.new(Date.parse(line[0]), Date.parse(line[1]), room)
+             all_reservations << reservation
+          end
+        end
+      end
+
+      return all_reservations
+    end
+
+    # TODO
+    def load_blocks
+
+    end
+
     def add_reservation(check_in_date, check_out_date)
+
       check_date(check_in_date)
       check_date(check_out_date)
       check_date_range(check_in_date, check_out_date)
@@ -20,16 +44,25 @@ module Hotel
         raise Exception.new("No room is available for this date range")
       else
         reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
-        @reservations << reservation
+        # @reservations << reservation
+        CSV.open('support/reservations.csv', "a") do |csv|
+          csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
+        end
+
         return reservation
       end
+    end
+
+    def reservations
+      load_reservations
     end
 
     def list_reservations(date)
       check_date(date)
 
       list = []
-      @reservations.each do |reservation|
+      all_reservations = load_reservations
+      all_reservations.each do |reservation|
         if reservation.check_in_date <= date && reservation.check_out_date > date
           list << reservation
         end
@@ -92,7 +125,10 @@ module Hotel
       check_out_date = block_value[:check_out_date]
       reservation = Hotel::Reservation.new(check_in_date, check_out_date, rooms.pop)
 
-      @reservations << reservation
+      # @reservations << reservation
+      CSV.open('support/reservations.csv', "a") do |csv|
+        csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
+      end
 
       return reservation
     end

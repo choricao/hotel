@@ -112,7 +112,7 @@ def print_reservations(reservations)
 end
 
 def list_all_reservations(front_desk)
-  all_reservations = front_desk.reservations
+  all_reservations = front_desk.load_reservations
   if all_reservations.length == 0
     puts "There is no existing reservation."
     return false

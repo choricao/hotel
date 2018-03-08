@@ -1,1 +1,5 @@
-id, check_in_date, check_out_date, room_number, cost
+check_in_date,check_out_date,room_number
+2018-03-05,2018-03-07,12
+2018-03-06,2018-03-08,4
+2018-03-07,2018-03-09,15
+2018-03-05,2018-03-08,16
