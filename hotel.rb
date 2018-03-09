@@ -5,7 +5,7 @@ require_relative './lib/room.rb'
 require 'pry'
 require 'date'
 
-def validate_choice(choices)
+def get_valid_choice(choices)
   user_choice = gets.chomp.to_i
   until choices.include?(user_choice)
     puts "Please make a valid choice: "
@@ -14,7 +14,7 @@ def validate_choice(choices)
   return user_choice
 end
 
-def validate_date
+def get_valid_date
   date = gets.chomp
   pattern = /^\d{4}-\d{1,2}-\d{1,2}$/
 
@@ -36,7 +36,11 @@ def validate_date
   end
 end
 
-def validate_room_count
+def valid_date_range?(check_in_date, check_out_date)
+  return check_in_date < check_out_date
+end
+
+def get_valid_room_count
   room_count = gets.chomp.to_i
   until room_count > 0 && room_count <= 5
     puts "Please enter a valid number:"
@@ -45,13 +49,17 @@ def validate_room_count
   return room_count
 end
 
-def validate_discount
+def get_valid_discount
   discount = gets.chomp.to_f
   until discount >= 0 && discount <= 1
     puts "Please enter a valid number:"
     discount = gets.chomp.to_f
   end
   return discount
+end
+
+# TODO
+def get_valid_block_id
 end
 
 def print_list(list)
@@ -77,9 +85,14 @@ end
 
 def list_avail_rooms(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = validate_date
+  check_in_date = get_valid_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = validate_date
+  check_out_date = get_valid_date
+  until valid_date_range?(check_in_date, check_out_date)
+    puts "Please enter a valid check out date (yyyy-mm-dd):"
+    check_out_date = get_valid_date
+  end
+
   avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
   if avail_rooms.length == 0
     puts "There is no available room between #{check_in_date} and #{check_out_date}."
@@ -99,7 +112,7 @@ def operate_rooms(choice, room_operations, front_desk)
         list_avail_rooms(front_desk)
     end
     print_list(room_operations)
-    choice = validate_choice((1..(room_operations.length + 1)))
+    choice = get_valid_choice((1..(room_operations.length + 1)))
   end
 end
 
@@ -112,7 +125,7 @@ def print_reservations(reservations)
 end
 
 def list_all_reservations(front_desk)
-  all_reservations = front_desk.load_reservations
+  all_reservations = front_desk.reservations
   if all_reservations.length == 0
     puts "There is no existing reservation."
     return false
@@ -125,7 +138,7 @@ end
 
 def list_reservations_for_a_date(front_desk)
   puts "Please enter the date (yyyy-mm-dd) you want to see:"
-  date = validate_date
+  date = get_valid_date
   reservations = front_desk.list_reservations(date)
   if reservations.length == 0
     puts "There is no existing reservation on #{date}."
@@ -139,9 +152,13 @@ end
 
 def make_reservation(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = validate_date
+  check_in_date = get_valid_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = validate_date
+  check_out_date = get_valid_date
+  until valid_date_range?(check_in_date, check_out_date)
+    puts "Please enter a valid check out date (yyyy-mm-dd):"
+    check_out_date = get_valid_date
+  end
   reservation = front_desk.add_reservation(check_in_date, check_out_date)
   puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}. The total cost for this reservation is $#{reservation.cost}"
 end
@@ -157,7 +174,7 @@ def operate_reservations(choice, reservation_operations, front_desk)
         make_reservation(front_desk)
     end
     print_list(reservation_operations)
-    choice = validate_choice((1..(reservation_operations.length + 1)))
+    choice = get_valid_choice((1..(reservation_operations.length + 1)))
   end
 end
 
@@ -183,13 +200,13 @@ end
 
 def add_block(front_desk)
   puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = validate_date
+  check_in_date = get_valid_date
   puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = validate_date
+  check_out_date = get_valid_date
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
-  room_count = validate_room_count
+  room_count = get_valid_room_count
   puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? ( 0.0 <= rate <= 1.0 )"
-  discount = validate_discount
+  discount = get_valid_discount
   block_value = front_desk.create_room_block(check_in_date, check_out_date, room_count, discount)
   puts "A block with #{room_count} rooms between #{check_in_date} and #{check_out_date} has been added. The discount rate is #{discount}."
 end
@@ -215,7 +232,7 @@ def operate_blocks(choice, block_operations, front_desk)
         reserve_from_block(front_desk)
     end
     print_list(block_operations)
-    choice = validate_choice((1..(block_operations.length + 1)))
+    choice = get_valid_choice((1..(block_operations.length + 1)))
   end
 end
 
@@ -228,23 +245,23 @@ front_desk = Hotel::FrontDesk.new
 
 puts "Welcome to the Hotel Booking System!"
 print_list(operations)
-operation = validate_choice((1..(operations.length + 1)))
+operation = get_valid_choice((1..(operations.length + 1)))
 
 until operation == operations.length + 1
   case operation
     when 1
       print_list(room_operations)
-      room_choice = validate_choice((1..(room_operations.length + 1)))
+      room_choice = get_valid_choice((1..(room_operations.length + 1)))
       operate_rooms(room_choice, room_operations, front_desk)
     when 2
       print_list(reservation_operations)
-      reservation_choice = validate_choice((1..(reservation_operations.length + 1)))
+      reservation_choice = get_valid_choice((1..(reservation_operations.length + 1)))
       operate_reservations(reservation_choice, reservation_operations, front_desk)
     when 3
       print_list(block_operations)
-      block_choice = validate_choice((1..(block_operations.length + 1)))
+      block_choice = get_valid_choice((1..(block_operations.length + 1)))
       operate_blocks(block_choice, block_operations, front_desk)
   end
   print_list(operations)
-  operation = validate_choice((1..(operations.length + 1)))
+  operation = get_valid_choice((1..(operations.length + 1)))
 end
