@@ -148,11 +148,6 @@ module Hotel
       return all_reservations
     end
 
-    # TODO
-    def load_blocks
-
-    end
-
     def generate_rooms
       rooms = []
       (1..20).to_a.each do |num|
