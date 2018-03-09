@@ -58,10 +58,6 @@ def get_valid_discount
   return discount
 end
 
-# TODO
-def get_valid_block_id
-end
-
 def print_list(list)
   puts "Please make a choice from the following list:"
   list.length.times  do |i|

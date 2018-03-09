@@ -103,6 +103,7 @@ module Hotel
       check_in_date = block_value[:check_in_date]
       check_out_date = block_value[:check_out_date]
       reservation = Hotel::Reservation.new(check_in_date, check_out_date, rooms.pop)
+      reservation.set_discount(block_value[:discount])
 
       @reservations << reservation
       CSV.open(RESERVATION_FILE, "a") do |csv|
@@ -138,7 +139,7 @@ module Hotel
       all_reservations = []
       my_file.each do |line|
         @rooms.each do |room|
-          if room.number.to_s == line["room_number"]
+          if room.number.to_s == line[2]
             reservation = Hotel::Reservation.new(Date.parse(line[0]), Date.parse(line[1]), room)
              all_reservations << reservation
           end

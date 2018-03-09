@@ -34,7 +34,7 @@ describe "Reservation" do
 
     it "accesses the cost of the reservation" do
       @reservation.must_respond_to :cost
-      @reservation.cost.must_be_kind_of Integer
+      @reservation.cost.must_be_kind_of Float
       @reservation.cost.must_equal 400
     end
 
