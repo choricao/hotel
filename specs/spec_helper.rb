@@ -1,6 +1,8 @@
 require 'date'
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+  add_filter "/specs/"
+end
 
 require 'minitest'
 require 'minitest/autorun'
