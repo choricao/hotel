@@ -18,9 +18,12 @@ module Hotel
       @cost = calculate_cost
     end
 
-
     def set_discount(discount)
-      @discount = discount
+      if discount >= 0 && discount <= 1
+        @discount = discount
+      else
+        raise ArgumentError.new("Invalid discount rate.")
+      end
     end
 
     private

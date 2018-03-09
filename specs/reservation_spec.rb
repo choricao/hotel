@@ -1,14 +1,14 @@
 require_relative 'spec_helper'
 
 describe "Reservation" do
+  before do
+    @check_in_date = Date.new(2018, 3, 5)
+    @check_out_date = Date.new(2018, 3, 7)
+    @room = Hotel::Room.new(1, 200)
+    @reservation = Hotel::Reservation.new(@check_in_date, @check_out_date, @room)
+  end
 
   describe "initialize" do
-    before do
-      @check_in_date = Date.new(2018, 3, 5)
-      @check_out_date = Date.new(2018, 3, 7)
-      @room = Hotel::Room.new(1, 200)
-      @reservation = Hotel::Reservation.new(@check_in_date, @check_out_date, @room)
-    end
 
     it "creates an instance of Reservation" do
       @reservation.must_be_instance_of Hotel::Reservation
@@ -40,6 +40,22 @@ describe "Reservation" do
 
     it "raises an ArgumentError if the date range is invalid" do
       proc { Hotel::Reservation.new(@check_out_date, @check_in_date, @room) }.must_raise ArgumentError
+    end
+
+  end
+
+  describe "set_discount" do
+
+    it "sets the discount value for that reservation" do
+      @reservation.set_discount(0.8)
+
+      @reservation.discount.must_equal 0.8
+    end
+
+    it "raises an error if the discount is not an number or < 0 or > 1" do
+      proc { @reservation.set_discount("1") }.must_raise ArgumentError
+      proc { @reservation.set_discount(-1) }.must_raise ArgumentError
+      proc { @reservation.set_discount(1.1) }.must_raise ArgumentError
     end
 
   end
