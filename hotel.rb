@@ -211,6 +211,10 @@ def reserve_from_block(front_desk)
   if list_all_blocks(front_desk)
     puts "Please choose the block you want to reserve from:"
     block_id = (gets.chomp.to_i - 1).to_s
+    until front_desk.room_blocks.keys.include?(block_id)
+      puts "Please make a valid choice:"
+      block_id = (gets.chomp.to_i - 1).to_s
+    end
     reservation = front_desk.reserve_from_block(block_id)
     reservation.cost *= front_desk.room_blocks[block_id][:discount]
     puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block. The total cost for this reservation is $#{reservation.cost}"
