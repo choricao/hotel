@@ -3,7 +3,9 @@ require 'csv'
 module Hotel
   class FrontDesk
 
-    attr_reader :rooms, :room_blocks
+    attr_reader :rooms, :reservations, :room_blocks
+
+    RESERVATION_FILE = 'support/reservations.csv'
 
     def initialize
       @rooms = generate_rooms
@@ -12,9 +14,9 @@ module Hotel
     end
 
     def load_reservations
-      my_file = CSV.read('support/reservations.csv', headers: true)
-      all_reservations = []
+      my_file = CSV.read(RESERVATION_FILE, headers: true)
 
+      all_reservations = []
       my_file.each do |line|
         @rooms.each do |room|
           if room.number.to_s == line["room_number"]
@@ -25,11 +27,6 @@ module Hotel
       end
 
       return all_reservations
-    end
-
-    # TODO
-    def load_blocks
-
     end
 
     def add_reservation(check_in_date, check_out_date)
@@ -44,17 +41,15 @@ module Hotel
         raise Exception.new("No room is available for this date range")
       else
         reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
-        # @reservations << reservation
-        CSV.open('support/reservations.csv', "a") do |csv|
+
+        @reservations << reservation
+
+        CSV.open(RESERVATION_FILE, "a") do |csv|
           csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
         end
 
         return reservation
       end
-    end
-
-    def reservations
-      load_reservations
     end
 
     def list_reservations(date)
@@ -94,6 +89,11 @@ module Hotel
       return avail_rooms - blocked_rooms
     end
 
+    # TODO
+    def load_blocks
+
+    end
+
     def create_room_block(check_in_date, check_out_date, room_count, discount)
       check_date(check_in_date)
       check_date(check_out_date)
@@ -125,8 +125,8 @@ module Hotel
       check_out_date = block_value[:check_out_date]
       reservation = Hotel::Reservation.new(check_in_date, check_out_date, rooms.pop)
 
-      # @reservations << reservation
-      CSV.open('support/reservations.csv', "a") do |csv|
+      @reservations << reservation
+      CSV.open(RESERVATION_FILE, "a") do |csv|
         csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
       end
 
@@ -140,6 +140,14 @@ module Hotel
         raise Exception.new("No room available from this room block")
       else
         return rooms
+      end
+    end
+
+    # Method for testing
+    def clear_reservations
+      @reservations = []
+      CSV.open(RESERVATION_FILE, "w") do |csv|
+        csv << ["check_in_date", "check_out_date", "room_number"]
       end
     end
 

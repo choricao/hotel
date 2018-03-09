@@ -3,6 +3,11 @@ require_relative 'spec_helper'
 describe "FrontDesk" do
   before do
     @front_desk = Hotel::FrontDesk.new
+    @front_desk.clear_reservations
+  end
+
+  after do
+    @front_desk.clear_reservations
   end
 
   describe "initialize" do
@@ -239,6 +244,20 @@ describe "FrontDesk" do
       end
 
       proc { @front_desk.get_avail_rooms_from_block("0") }.must_raise Exception
+    end
+
+  end
+
+  describe "clear_reservations" do
+
+    it "clears all reservations in csv file" do
+      @front_desk.add_reservation(Date.new(2018, 3, 5), Date.new(2018, 3, 7))
+
+      @front_desk.reservations.length.must_be :>, 0
+
+      @front_desk.clear_reservations
+
+      @front_desk.reservations.length.must_equal 0
     end
 
   end
