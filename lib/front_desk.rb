@@ -13,22 +13,6 @@ module Hotel
       @room_blocks = {}
     end
 
-    def load_reservations
-      my_file = CSV.read(RESERVATION_FILE, headers: true)
-
-      all_reservations = []
-      my_file.each do |line|
-        @rooms.each do |room|
-          if room.number.to_s == line["room_number"]
-            reservation = Hotel::Reservation.new(Date.parse(line[0]), Date.parse(line[1]), room)
-             all_reservations << reservation
-          end
-        end
-      end
-
-      return all_reservations
-    end
-
     def add_reservation(check_in_date, check_out_date)
 
       check_date(check_in_date)
@@ -89,11 +73,6 @@ module Hotel
       return avail_rooms - blocked_rooms
     end
 
-    # TODO
-    def load_blocks
-
-    end
-
     def create_room_block(check_in_date, check_out_date, room_count, discount)
       check_date(check_in_date)
       check_date(check_out_date)
@@ -143,7 +122,7 @@ module Hotel
       end
     end
 
-    # Method for testing
+    # Special method for testing
     def clear_reservations
       @reservations = []
       CSV.open(RESERVATION_FILE, "w") do |csv|
@@ -152,6 +131,27 @@ module Hotel
     end
 
     private
+
+    def load_reservations
+      my_file = CSV.read(RESERVATION_FILE, headers: true)
+
+      all_reservations = []
+      my_file.each do |line|
+        @rooms.each do |room|
+          if room.number.to_s == line["room_number"]
+            reservation = Hotel::Reservation.new(Date.parse(line[0]), Date.parse(line[1]), room)
+             all_reservations << reservation
+          end
+        end
+      end
+
+      return all_reservations
+    end
+
+    # TODO
+    def load_blocks
+
+    end
 
     def generate_rooms
       rooms = []
