@@ -124,11 +124,9 @@ def list_all_reservations(front_desk)
   all_reservations = front_desk.reservations
   if all_reservations.length == 0
     puts "There is no existing reservation."
-    return false
   else
     puts "Here is a list of all reservations in this hotel:"
     print_reservations(all_reservations)
-    return true
   end
 end
 
@@ -138,11 +136,9 @@ def list_reservations_for_a_date(front_desk)
   reservations = front_desk.list_reservations(date)
   if reservations.length == 0
     puts "There is no existing reservation on #{date}."
-    return false
   else
     puts "Here is a list of reservations on #{date}:"
     print_reservations(reservations)
-    return true
   end
 end
 
@@ -155,8 +151,14 @@ def make_reservation(front_desk)
     puts "Please enter a valid check out date (yyyy-mm-dd):"
     check_out_date = get_valid_date
   end
-  reservation = front_desk.add_reservation(check_in_date, check_out_date)
-  puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}. The total cost for this reservation is $#{reservation.cost}"
+
+  avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
+  if avail_rooms.length == 0
+    puts "There is no available room between #{check_in_date} and #{check_out_date}."
+  else
+    reservation = front_desk.add_reservation(check_in_date, check_out_date)
+    puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date}. The total cost for this reservation is $#{reservation.cost}"
+  end
 end
 
 def operate_reservations(choice, reservation_operations, front_desk)
@@ -199,12 +201,22 @@ def add_block(front_desk)
   check_in_date = get_valid_date
   puts "Please enter check out date (yyyy-mm-dd):"
   check_out_date = get_valid_date
+  until valid_date_range?(check_in_date, check_out_date)
+    puts "Please enter a valid check out date (yyyy-mm-dd):"
+    check_out_date = get_valid_date
+  end
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
   room_count = get_valid_room_count
   puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? ( 0.0 <= rate <= 1.0 )"
   discount = get_valid_discount
-  block_value = front_desk.create_room_block(check_in_date, check_out_date, room_count, discount)
-  puts "A block with #{room_count} rooms between #{check_in_date} and #{check_out_date} has been added. The discount rate is #{discount}."
+
+  avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
+  if avail_rooms.length < room_count
+    puts "There is not enough room between #{check_in_date} and #{check_out_date}."
+  else
+    block_value = front_desk.create_room_block(check_in_date, check_out_date, room_count, discount)
+    puts "A block with #{room_count} rooms between #{check_in_date} and #{check_out_date} has been added. The discount rate is #{discount}."
+  end
 end
 
 def reserve_from_block(front_desk)
@@ -215,9 +227,15 @@ def reserve_from_block(front_desk)
       puts "Please make a valid choice:"
       block_id = (gets.chomp.to_i - 1).to_s
     end
-    reservation = front_desk.reserve_from_block(block_id)
-    reservation.cost *= front_desk.room_blocks[block_id][:discount]
-    puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block. The total cost for this reservation is $#{reservation.cost}"
+
+    block_value = front_desk.room_blocks[block_id]
+    if block_value[:rooms].length == 0
+      puts "All rooms from this block has been reserved."
+    else
+      reservation = front_desk.reserve_from_block(block_id)
+      reservation.cost *= front_desk.room_blocks[block_id][:discount]
+      puts "Room #{reservation.room.number} has been reserved between #{reservation.check_in_date} and #{reservation.check_out_date} from the current block. The total cost for this reservation is $#{reservation.cost}"
+    end
   end
 end
 

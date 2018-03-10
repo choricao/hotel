@@ -40,8 +40,7 @@ module Hotel
       check_date(date)
 
       list = []
-      all_reservations = load_reservations
-      all_reservations.each do |reservation|
+      @reservations.each do |reservation|
         if reservation.check_in_date <= date && reservation.check_out_date > date
           list << reservation
         end
@@ -116,11 +115,7 @@ module Hotel
     def get_avail_rooms_from_block(block_id)
       block_value = @room_blocks[block_id]
       rooms = block_value[:rooms]
-      if rooms.empty?
-        raise Exception.new("No room available from this room block")
-      else
-        return rooms
-      end
+      return rooms
     end
 
     # Special method for testing

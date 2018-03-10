@@ -238,12 +238,13 @@ describe "FrontDesk" do
       end
     end
 
-    it "raises an Exception if no room available in that block" do
+    it "returns empty array if no room available in that block" do
       5.times do
         @front_desk.reserve_from_block("0")
       end
 
-      proc { @front_desk.get_avail_rooms_from_block("0") }.must_raise Exception
+      @front_desk.get_avail_rooms_from_block("0").must_be_instance_of Array
+      @front_desk.get_avail_rooms_from_block("0").length.must_equal 0
     end
 
   end
