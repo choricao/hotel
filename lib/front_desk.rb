@@ -14,26 +14,22 @@ module Hotel
     end
 
     def add_reservation(check_in_date, check_out_date)
-
       check_date(check_in_date)
       check_date(check_out_date)
       check_date_range(check_in_date, check_out_date)
 
       avail_rooms = get_avail_rooms(check_in_date, check_out_date)
-
       if avail_rooms.empty?
         raise Exception.new("No room is available for this date range")
-      else
-        reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
-
-        @reservations << reservation
-
-        CSV.open(RESERVATION_FILE, "a") do |csv|
-          csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
-        end
-
-        return reservation
       end
+
+      reservation = Hotel::Reservation.new(check_in_date, check_out_date, avail_rooms.sample)
+      @reservations << reservation
+      CSV.open(RESERVATION_FILE, "a") do |csv|
+        csv << [check_in_date.to_s, check_out_date.to_s, reservation.room.number.to_s]
+      end
+
+      return reservation
     end
 
     def list_reservations(date)
@@ -50,6 +46,10 @@ module Hotel
     end
 
     def get_avail_rooms(check_in_date, check_out_date)
+      check_date(check_in_date)
+      check_date(check_out_date)
+      check_date_range(check_in_date, check_out_date)
+
       avail_rooms_array = []
       (check_in_date...check_out_date).to_a.each do |date|
         avail_rooms_array << list_empty_rooms(date)
@@ -77,25 +77,29 @@ module Hotel
       check_date(check_out_date)
       check_date_range(check_in_date, check_out_date)
       check_room_count(room_count)
+      check_discount(discount)
 
       avail_rooms = get_avail_rooms(check_in_date, check_out_date)
 
       if avail_rooms.length < room_count
         raise Exception.new("Not enough rooms for creating a room block")
-      else
-        rooms = []
-        room_count.times do
-          rooms << avail_rooms.pop
-        end
-        block_id = @room_blocks.length.to_s
-        block_value = { rooms: rooms, check_in_date: check_in_date, check_out_date: check_out_date, discount: discount }
-
-        @room_blocks[block_id] = block_value
-        return block_value
       end
+
+      rooms = []
+      room_count.times do
+        rooms << avail_rooms.pop
+      end
+      block_id = @room_blocks.length.to_s
+      block_value = { rooms: rooms, check_in_date: check_in_date, check_out_date: check_out_date, discount: discount }
+
+      @room_blocks[block_id] = block_value
+
+      return block_value
     end
 
     def reserve_from_block(block_id)
+      check_block_id(block_id)
+
       rooms = get_avail_rooms_from_block(block_id)
       block_value = @room_blocks[block_id]
 
@@ -152,6 +156,19 @@ module Hotel
       return rooms
     end
 
+    def list_empty_rooms(date)
+      check_date(date)
+
+      reservation_list = list_reservations(date)
+      reserved_rooms = []
+
+      reservation_list.each do |reservation|
+        reserved_rooms << reservation.room
+      end
+
+      return @rooms - reserved_rooms
+    end
+
     def check_date(date)
       if date.class != Date
         raise ArgumentError.new("Invalid date")
@@ -170,17 +187,16 @@ module Hotel
       end
     end
 
-    def list_empty_rooms(date)
-      check_date(date)
-
-      reservation_list = list_reservations(date)
-      reserved_rooms = []
-
-      reservation_list.each do |reservation|
-        reserved_rooms << reservation.room
+    def check_discount(discount)
+      if (discount.class != Float && discount.class != Integer) || discount < 0 || discount > 1
+        raise ArgumentError.new("Invalid discount rate")
       end
+    end
 
-      return @rooms - reserved_rooms
+    def check_block_id(block_id)
+      if !@room_blocks.keys.include?(block_id)
+        raise ArgumentError.new("Invalid block id")
+      end
     end
 
   end

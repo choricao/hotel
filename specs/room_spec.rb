@@ -11,19 +11,19 @@ describe "Room" do
       @room.must_be_instance_of Hotel::Room
     end
 
-    it "reads the room number" do
+    it "takes the room number" do
       @room.must_respond_to :number
       @room.number.must_be_kind_of Integer
       @room.number.must_equal 1
     end
 
-    it "reads the rate of the room" do
+    it "takes the rate of the room" do
       @room.must_respond_to :rate
       @room.rate.must_be_instance_of Integer
       @room.rate.must_equal 200
     end
 
-    it "writes the rate of the room" do
+    it "sets the rate of the room" do
       @room.rate = 180
 
       @room.rate.must_equal 180

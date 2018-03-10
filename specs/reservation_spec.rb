@@ -14,25 +14,25 @@ describe "Reservation" do
       @reservation.must_be_instance_of Hotel::Reservation
     end
 
-    it "accesses the check in date" do
+    it "takes the check in date" do
       @reservation.must_respond_to :check_in_date
       @reservation.check_in_date.must_be_kind_of Date
       @reservation.check_in_date.must_equal @check_in_date
     end
 
-    it "accesses the check out date" do
+    it "takes the check out date" do
       @reservation.must_respond_to :check_out_date
       @reservation.check_out_date.must_be_instance_of Date
       @reservation.check_out_date.must_equal @check_out_date
     end
 
-    it "accesses the room being reserved" do
+    it "takes the room being reserved" do
       @reservation.must_respond_to :room
       @reservation.room.must_be_instance_of Hotel::Room
       @reservation.room.number.must_equal 1
     end
 
-    it "accesses the cost of the reservation" do
+    it "takes the cost of the reservation" do
       @reservation.must_respond_to :cost
       @reservation.cost.must_be_kind_of Float
       @reservation.cost.must_equal 400
