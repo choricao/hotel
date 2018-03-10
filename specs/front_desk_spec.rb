@@ -1,5 +1,9 @@
 require_relative 'spec_helper'
 
+# TODO: Because clear_reservations was called before and after each test, part of load_reservations method cannot be covered by SimpleCov if there is no data in reservations.csv file. Therefore, please paste the sample data below to reservations.csv file before running testing.
+# 2018-3-5,2018-3-6,1
+# 2018-3-5,2018-3-6,2
+
 describe "FrontDesk" do
   before do
     @check_in_date = Date.new(2018, 3, 5)
@@ -188,7 +192,7 @@ describe "FrontDesk" do
         @front_desk.add_reservation(@check_in_date, @check_out_date)
       end
 
-      proc { @front_desk.create_room_block(@check_in_dater, @check_out_date, 5, 0.9) }.must_raise Exception
+      proc { @front_desk.create_room_block(@check_in_date, @check_out_date, 5, 0.9) }.must_raise Exception
     end
 
     it "rasies an ArgumentError if check in date and/or check out date is invalid" do

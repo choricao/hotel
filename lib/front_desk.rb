@@ -138,7 +138,7 @@ module Hotel
       all_reservations = []
       my_file.each do |line|
         @rooms.each do |room|
-          if room.number.to_s == line[2]
+          if room.number.to_s == line["room_number"]
             reservation = Hotel::Reservation.new(Date.parse(line[0]), Date.parse(line[1]), room)
              all_reservations << reservation
           end
