@@ -40,6 +40,24 @@ def valid_date_range?(check_in_date, check_out_date)
   return check_in_date < check_out_date
 end
 
+def get_valid_date_range
+  date_range = []
+
+  puts "Please enter check in date (yyyy-mm-dd):"
+  check_in_date = get_valid_date
+  date_range << check_in_date
+
+  puts "Please enter check out date (yyyy-mm-dd):"
+  check_out_date = get_valid_date
+  until valid_date_range?(check_in_date, check_out_date)
+    puts "Please enter a valid check out date (yyyy-mm-dd):"
+    check_out_date = get_valid_date
+  end
+  date_range << check_out_date
+
+  return date_range
+end
+
 def get_valid_room_count
   room_count = gets.chomp.to_i
   until room_count > 0 && room_count <= 5
@@ -80,14 +98,9 @@ def list_all_rooms(front_desk)
 end
 
 def list_avail_rooms(front_desk)
-  puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = get_valid_date
-  puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = get_valid_date
-  until valid_date_range?(check_in_date, check_out_date)
-    puts "Please enter a valid check out date (yyyy-mm-dd):"
-    check_out_date = get_valid_date
-  end
+  date_range = get_valid_date_range
+  check_in_date = date_range[0]
+  check_out_date = date_range[1]
 
   avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
   if avail_rooms.length == 0
@@ -143,14 +156,9 @@ def list_reservations_for_a_date(front_desk)
 end
 
 def make_reservation(front_desk)
-  puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = get_valid_date
-  puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = get_valid_date
-  until valid_date_range?(check_in_date, check_out_date)
-    puts "Please enter a valid check out date (yyyy-mm-dd):"
-    check_out_date = get_valid_date
-  end
+  date_range = get_valid_date_range
+  check_in_date = date_range[0]
+  check_out_date = date_range[1]
 
   avail_rooms = front_desk.get_avail_rooms(check_in_date, check_out_date)
   if avail_rooms.length == 0
@@ -197,14 +205,10 @@ def list_all_blocks(front_desk)
 end
 
 def add_block(front_desk)
-  puts "Please enter check in date (yyyy-mm-dd):"
-  check_in_date = get_valid_date
-  puts "Please enter check out date (yyyy-mm-dd):"
-  check_out_date = get_valid_date
-  until valid_date_range?(check_in_date, check_out_date)
-    puts "Please enter a valid check out date (yyyy-mm-dd):"
-    check_out_date = get_valid_date
-  end
+  date_range = get_valid_date_range
+  check_in_date = date_range[0]
+  check_out_date = date_range[1]
+  
   puts "How many rooms do you want to put in this room block? ( 0 < number <= 5 )"
   room_count = get_valid_room_count
   puts "What is the discount rate (e.g. enter 0.8 for '20% OFF') for this block? ( 0.0 <= rate <= 1.0 )"
